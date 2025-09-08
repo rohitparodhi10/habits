@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flipbook PDF</title>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Turn.js -->
+  <script src="https://cdn.jsdelivr.net/gh/blasten/turn.js/turn.min.js"></script>
+
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+  <style>
+    body {
+      background: #ddd;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      height: 100vh;
+    }
+
+    #flipbook {
+      width: 800px;
+      height: 600px;
+      margin-bottom: 0; /* removed extra gap */
+      transition: all 0.5s ease;
+    }
+
+    #flipbook.fullscreen {
+      width: 100vw !important;
+      height: 100vh !important;
+      margin-bottom: 0; /* remove gap in fullscreen */
+    }
+
+    #flipbook .page {
+      background: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 5px;
+    }
+
+    .controls button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #333;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
+    .controls button:hover {
+      background: #555;
+    }
+
+    .page-number {
+      margin-top: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* Hide controls when fullscreen */
+    #flipbook.fullscreen + .controls {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="flipbook"></div>
+
+  <div class="controls">
+    <button id="prev">⬅️ Previous</button>
+    <button id="next">Next ➡️</button>
+    <button id="fullscreen">⛶ Fullscreen</button>
+  </div>
+
+  <div class="page-number">
+    Page <span id="currentPage">1</span> of <span id="totalPages">0</span>
+  </div>
+
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+
+    const pdfPath = "{% static 'files/magzine.pdf' %}";
+    let isFullscreen = false;
+
+    async function loadPDF() {
+      const pdf = await pdfjsLib.getDocument(pdfPath).promise;
+      const flipbook = $("#flipbook");
+      $("#totalPages").text(pdf.numPages);
+
+      // create pages
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const pageDiv = $("<div class='page'></div>");
+        const canvas = document.createElement("canvas");
+        pageDiv.append(canvas);
+        flipbook.append(pageDiv);
+        renderPage(pdf, i, canvas);
+      }
+
+      // Initialize Turn.js
+      flipbook.turn({
+        width: flipbook.width(),
+        height: flipbook.height(),
+        autoCenter: true,
+        elevation: 50,
+        gradients: true,
+        display: 'double',
+        duration: 800,
+        when: {
+          turned: function(event, page) {
+            $("#currentPage").text(page);
+            updateDisplayMode(page, pdf.numPages);
+          }
+        }
+      });
+
+      // Previous / Next buttons
+      $("#prev").on("click", function() {
+        const current = flipbook.turn("page");
+        const total = pdf.numPages;
+        updateDisplayMode(current - 1, total);
+        flipbook.turn("previous");
+      });
+
+      $("#next").on("click", function() {
+        const current = flipbook.turn("page");
+        const total = pdf.numPages;
+        updateDisplayMode(current + 1, total);
+        flipbook.turn("next");
+      });
+
+      // Click near edges to flip
+      flipbook.on("click", function(e){
+        const offset = flipbook.offset();
+        const x = e.pageX - offset.left;
+        const width = flipbook.width();
+        const current = flipbook.turn("page");
+        const total = pdf.numPages;
+
+        if(x < width * 0.2){
+          updateDisplayMode(current - 1, total);
+          flipbook.turn("previous");
+        } else if(x > width * 0.8){
+          updateDisplayMode(current + 1, total);
+          flipbook.turn("next");
+        }
+      });
+
+      // Fullscreen toggle
+      $("#fullscreen").on("click", function(){
+        const elem = document.documentElement;
+
+        if(!isFullscreen){
+          if(elem.requestFullscreen) elem.requestFullscreen();
+          flipbook.addClass("fullscreen");
+          flipbook.turn("size", window.innerWidth, window.innerHeight);
+        } else {
+          if(document.exitFullscreen) document.exitFullscreen();
+          flipbook.removeClass("fullscreen");
+          flipbook.turn("size", 800, 600);
+        }
+
+        isFullscreen = !isFullscreen;
+      });
+    }
+
+    function updateDisplayMode(current, total){
+      if(current === 1 || current === total){
+        $("#flipbook").turn("display", "single");
+      } else {
+        $("#flipbook").turn("display", "double");
+      }
+    }
+
+    async function renderPage(pdf, pageNumber, canvas){
+      const page = await pdf.getPage(pageNumber);
+      const viewport = page.getViewport({scale: 2});
+      const ctx = canvas.getContext("2d");
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      await page.render({canvasContext: ctx, viewport: viewport}).promise;
+    }
+
+    loadPDF();
+  </script>
+</body>
+</html>
