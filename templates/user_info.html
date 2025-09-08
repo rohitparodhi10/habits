@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>My Info</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #444;
+        }
+
+        .profile-container {
+            background: #fff;
+            max-width: 420px;
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 40px 50px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: 700;
+            color: #5a2d82;
+            font-size: 2.4rem;
+            margin-bottom: 35px;
+            letter-spacing: 1.2px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1.5px solid #eee;
+            font-size: 1.1rem;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #7a4d9d;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            width: 50%;
+        }
+
+        .info-value {
+            color: #3e3e3e;
+            width: 50%;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1.25rem;
+            color: #fff;
+            font-weight: 500;
+            margin-top: 30px;
+            text-shadow: 1px 1px 6px rgba(0,0,0,0.4);
+        }
+    </style>
+</head>
+<body>
+  {% include 'header.html' %}
+    <div class="profile-container">
+        <h2>My Information</h2>
+
+        {% if show_info %}
+            {% for info in show_info %}
+                <div class="info-row">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">{{ info.fullname }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Age</div>
+                    <div class="info-value">{{ info.age }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Height (cm)</div>
+                    <div class="info-value">{{ info.height }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Weight (kg)</div>
+                    <div class="info-value">{{ info.weight }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Working Status</div>
+                    <div class="info-value">{{ info.working }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Working Hours/Day</div>
+                    <div class="info-value">{{ info.working_hours }}</div>
+                </div>
+                <hr style="margin: 25px 0; border: 0.5px solid #ddd;">
+            {% endfor %}
+        {% else %}
+            <p>No information available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

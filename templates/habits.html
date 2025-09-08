@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Habits</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 0 20px 60px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #4a90e2;
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 2.4rem;
+    }
+
+    form#add-habit-form {
+      background: #e9f0fc;
+      border-radius: 8px;
+      padding: 20px 30px;
+      box-shadow: inset 0 0 8px #c8d6f9;
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    form#add-habit-form label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #2c3e50;
+    }
+    form#add-habit-form input[type="text"],
+    form#add-habit-form input[type="date"],
+    form#add-habit-form select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+      border: 1.5px solid #b0c4de;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    form#add-habit-form input[type="text"]:focus,
+    form#add-habit-form input[type="date"]:focus,
+    form#add-habit-form select:focus {
+      border-color: #4a90e2;
+      outline: none;
+    }
+    form#add-habit-form button {
+      display: block;
+      width: 100%;
+      padding: 12px 0;
+      background-color: #4a90e2;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    form#add-habit-form button:hover {
+      background-color: #357abd;
+    }
+
+    .habit-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .habit-card {
+      background: #fff;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      width: 280px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: border-color 0.3s ease;
+    }
+    .habit-card:hover {
+      border-color: #4a90e2;
+      box-shadow: 0 6px 18px rgba(74, 144, 226, 0.3);
+    }
+    .habit-card h3 {
+      margin: 0 0 15px;
+      font-size: 1.4rem;
+      color: #2c3e50;
+      text-align: center;
+    }
+    .habit-info {
+      width: 100%;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      color: #555;
+    }
+    .habit-info strong {
+      color: #333;
+    }
+
+    
+    .status {
+      font-weight: 700;
+      color: #28a745; 
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    .btn {
+      flex: 1;
+      padding: 10px 0;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+      text-align: center;
+      color: white;
+      text-decoration: none;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    .btn.primary {
+      background-color: #4a90e2;
+    }
+    .btn.primary:hover {
+      background-color: #357abd;
+    }
+    .btn.secondary {
+      background-color: #f0ad4e;
+    }
+    .btn.secondary:hover {
+      background-color: #d5942f;
+    }
+    .btn.danger {
+      background-color: #d9534f;
+    }
+    .btn.danger:hover {
+      background-color: #b9302b;
+    }
+
+    @media (max-width: 700px) {
+      .habit-grid {
+        flex-direction: column;
+        align-items: center;
+      }
+      .habit-card {
+        width: 90%;
+      }
+      form#add-habit-form {
+        width: 90%;
+        padding: 15px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🌟 Your Habits for Today 🌟</h1>
+
+    
+    <form id="add-habit-form" method="POST" action="">
+      {% csrf_token %}
+      <label for="name">Habit Name</label>
+      <input type="text" id="name" name="name" placeholder="Enter habit name" required />
+
+      <label for="habit_type">Habit Type</label>
+      <select id="habit_type" name="habit_type" required>
+        <option value="" disabled selected>Select type</option>
+        <option value="Good">Good</option>
+        <option value="Bad">Bad</option>
+      </select>
+
+      <label for="frequency">Frequency</label>
+      <input type="text" id="frequency" name="frequency" placeholder="e.g., Daily, Weekly" required />
+
+      <label for="start_date">Start Date</label>
+      <input type="date" id="start_date" name="start_date" required />
+
+      <label for="end_date">End Date (optional)</label>
+      <input type="date" id="end_date" name="end_date" />
+
+      <label for="is_active">Is Active?</label>
+      <select id="is_active" name="is_active" required>
+        <option value="True" selected>Yes</option>
+        <option value="False">No</option>
+      </select>
+
+      <button type="submit">Add Habit</button>
+    </form>
+  </div>
+
+</body>
+</html>

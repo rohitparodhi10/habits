@@ -1,0 +1,185 @@
+{% load static custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f6f8fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      margin-top: 80px;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 30px;
+      color: #2c3e50;
+    }
+
+    .habit-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+    }
+
+    .habit-grid.single {
+      justify-content: center;
+    }
+
+    .habit-card {
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+      padding: 25px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 320px;
+      width: 100%;
+      min-height: 170px;
+    }
+
+    .habit-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .habit-card h3 {
+      margin: 0;  
+      font-size: 1.4rem;
+      color: #333;
+    }
+
+    .status {
+      font-weight: 600;
+      color: #28a745;
+      font-size: 1.1rem;
+      margin: 0;  
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      min-width: 110px;
+      display: inline-block;
+      transition: background-color 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .btn.primary {
+      background-color: #4a90e2;
+      color: white;
+    }
+
+    .btn.primary:hover {
+      background-color: #357abd;
+    }
+
+    .btn.secondary {
+      background-color: #f0ad4e;
+      color: white;
+    }
+
+    .btn.secondary:hover {
+      background-color: #d5942f;
+    }
+
+    .btn.danger {
+      background-color: #d9534f;
+      color: white;
+    }
+
+    .btn.danger:hover {
+      background-color: #b9302b;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin: 0;  
+    }
+
+    .button-group form,
+    .button-group a {
+      margin: 0;
+    }
+
+    .add-habit-container {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 600px) {
+      .habit-card {
+        width: 100%;
+        min-height: auto;
+      }
+
+      .btn {
+        width: 100%;
+        margin: 8px 0;
+      }
+
+      .button-group {
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  {% include 'header.html' %}
+
+  <div class="container">
+    <h1>🌟 Your Habits for {{ today }} 🌟</h1>
+
+    <div class="habit-grid {% if habits|length == 1 %}single{% endif %}">
+      {% for habit in habits %}
+        {% with record=records|get_record:habit %}
+        <div class="habit-card">
+          <h3>{{ habit.name }}</h3>
+
+          <div class="button-group">
+            {% if record and record.completed %}
+              <p class="status">✅ Completed</p>
+            {% else %}
+              <form method="POST" action="{% url 'mark_completed' habit.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn primary">Mark as Done</button>
+              </form>
+            {% endif %}
+
+            <a href="{% url 'update_habit' habit.id %}" class="btn secondary">Edit</a>
+            <a href="{% url 'delete_habit' habit.id %}" class="btn danger">Delete</a>
+          </div>
+        </div>
+        {% endwith %}
+      {% empty %}
+        <p>No habits found for today.</p>
+      {% endfor %}
+    </div>
+
+    <div class="add-habit-container">
+      <a href="{% url 'add_habits' %}" class="btn primary">+ Add Habit</a>
+    </div>
+  </div>
+  {% include 'footer.html' %}
+</body>
+</html>

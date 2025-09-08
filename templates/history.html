@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Completed Habits History</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #f0f4f8;
+      color: #333;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      background: white;
+      max-width: 700px;
+      margin-top: 80px;
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      padding: 30px 40px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #007BFF;
+      margin-bottom: 25px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .habit-card {
+      border: 1px solid #e1e7ee;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      padding: 20px 25px;
+      background-color: #fafbfd;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .habit-card:hover {
+      box-shadow: 0 8px 25px rgba(0,123,255,0.15);
+    }
+
+    .habit-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #0056b3;
+      margin-bottom: 12px;
+    }
+
+    ul.history-list {
+      list-style-type: disc;
+      padding-left: 20px;
+      color: #555;
+    }
+
+    ul.history-list li {
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .no-history {
+      text-align: center;
+      color: #777;
+      font-style: italic;
+      padding: 50px 0;
+      font-size: 1.1rem;
+    }
+
+    .back-link {
+      display: block;
+      margin: 30px auto 0;
+      max-width: 150px;
+      text-align: center;
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-link:hover {
+      background-color: #0056b3;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+      }
+      .habit-name {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+    {% include 'header.html' %}
+  <div class="container">
+    <h1>Completed Habits History</h1>
+
+    {% if habits_with_history %}
+      {% for item in habits_with_history %}
+        <div class="habit-card">
+          <div class="habit-name">{{ item.habit.name }}</div>
+          <ul class="history-list">
+            {% for date in item.history %}
+              <li>{{ date }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="no-history">No completed habits found.</p>
+    {% endif %}
+
+    <a href="{% url 'dashboard' %}" class="back-link">Back to Dashboard</a>
+  </div>
+</body>
+</html>

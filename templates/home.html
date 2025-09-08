@@ -1,0 +1,29 @@
+{% load habit_extras %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Habit Tracker</title>
+</head>
+<body>
+    <h1>Today's Habits ({{ today }})</h1>
+    <ul>
+        {% for habit in habits %}
+            <li>
+                {{ habit.name }}
+                {% if completed_map|get_item:habit.id %}
+                    ✅ Done
+                {% else %}
+                    <a href="{% url 'toggle_check' habit.id %}">Mark Done</a>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No habits yet. <a href="{% url 'add_habit' %}">Add a habit</a></li>
+        {% endfor %}
+    </ul>
+
+    <p>
+        <a href="{% url 'add_habit' %}">➕ Add New Habit</a> |
+        
+    </p>
+</body>
+</html>
