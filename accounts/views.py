@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib import messages
 from accounts.models import Register, UserInfo
+from django.conf import settings
+import os
 
 def register_view(request):
     if request.method == 'POST':
@@ -66,3 +68,8 @@ def user_info(request):
 def user_info_show(request):
     show_info=UserInfo.objects.all()
     return render(request, 'user_info.html', {'show_info':show_info} )
+
+
+def flipbook_view(request):
+    return render(request, 'flipbook.html')
+
